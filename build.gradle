@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group 'org.blisslee'
+version '1.0-SNAPSHOT'
+
+//repositories {
+//    mavenCentral()
+//}
+
+
+allprojects {
+    repositories {
+        def REPOSITORY_URL = System.getenv("MAVEN_REPOSITORY_URL") ?: 'http://maven.aliyun.com/nexus/content/groups/public/'
+        all { ArtifactRepository repo ->
+            if (repo instanceof MavenArtifactRepository) {
+                def url = repo.url.toString()
+                if (url.startsWith('https://repo1.maven.org/maven2') || url.startsWith('https://jcenter.bintray.com/')) {
+                    project.logger.lifecycle "Repository ${repo.url} replaced by $REPOSITORY_URL."
+                    remove repo
+                }
+            }
+        }
+        maven {
+            url REPOSITORY_URL
+        }
+        maven {
+            url System.getenv("MAVEN_REPOSITORY_URL") ?: "https://jitpack.io"
+        }
+
+        maven {
+            url System.getenv("MAVEN_REPOSITORY_URL") ?: 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
+        }
+    }
+
+    apply plugin: 'idea'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

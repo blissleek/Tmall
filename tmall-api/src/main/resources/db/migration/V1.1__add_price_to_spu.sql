@@ -1,0 +1,1 @@
+alter table tmall_product_spu add price decimal(20, 2) not Null;

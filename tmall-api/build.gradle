@@ -1,0 +1,60 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'org.blisslee'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+//
+//repositories {
+//    mavenCentral()
+//}
+
+dependencies {
+    implementation ('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    }
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-undertow', version: '2.2.6.RELEASE'
+
+    compile MYBATIS_STATER
+    compile MYSQL_COMMECTOR
+    compile FLYWAY
+    compile DRUID
+    compile group: 'redis.clients', name: 'jedis', version: '3.3.0'
+
+
+    compile (SWAGGER_CORE) {
+        exclude group: 'io.swagger', module: 'swagger-models'
+    }
+    compile 'io.swagger:swagger-models:1.5.21'
+    compile SWAGGER_UI
+
+//    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: '2.2.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.2.6.RELEASE'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
+    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.68'
+
+//    compile group: 'cn.hutool', name: 'hutool-all', version: '5.2.3'
+//    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
+
+    // Rabbit MQ
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '2.2.6.RELEASE'
+
+
+    compile project(':tmall-attachment')
+    compile project(':tmall-common')
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

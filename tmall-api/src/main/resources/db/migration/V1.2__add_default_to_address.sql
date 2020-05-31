@@ -1,0 +1,1 @@
+alter table tmall_recevier_address add is_default int(1) DEFAULT 0 COMMENT '是否为默认地址：1：默认，0：非默认';

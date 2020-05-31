@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.blisslee.tmall.api.mapper.TmallProductCategoryMapper">
+    <resultMap id="BaseResultMap" type="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="parent_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="sort" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="created_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="updated_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="ResultMapWithChildren" type="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="name" column="name"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <collection property="children" column="id" select="findChildren"/>
+    </resultMap>
+
+    <resultMap id="ResultMapWithGrandchild" type="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="name" column="name"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <collection property="children" column="id" select="findGrandchild"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, parent_id, name, status, sort, created_at, updated_at
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tmall_product_category
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAllCategory" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM tmall_product_category
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectAll" resultMap="ResultMapWithChildren">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tmall_product_category
+        WHERE status = 1 and (parent_id IS NULL OR parent_id = 0)
+        GROUP BY id
+        ORDER BY sort, id
+    </select>
+
+    <select id="countSelectAll" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tmall_product_category
+    </select>
+
+    <select id="findChildren" parameterType="java.lang.Integer" resultMap="ResultMapWithGrandchild">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tmall_product_category
+        WHERE status = 1 and parent_id = #{id}
+        GROUP BY id
+        ORDER BY sort, id
+    </select>
+
+    <select id="findGrandchild" parameterType="java.lang.Integer" resultMap="ResultMapWithChildren">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tmall_product_category
+        WHERE status = 1 and parent_id = #{id}
+        GROUP BY id
+        ORDER BY sort, id
+    </select>
+
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        update tmall_product_category
+        set status = 0
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insert" parameterType="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_product_category (parent_id, name, status,
+        sort, created_at, updated_at
+        )
+        values (#{parentId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+        #{sort,jdbcType=INTEGER}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_product_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="createdAt != null">
+                created_at,
+            </if>
+            <if test="updatedAt != null">
+                updated_at,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="createdAt != null">
+                #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        update tmall_product_category
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="org.blisslee.tmall.api.entity.model.TmallProductCategory">
+        update tmall_product_category
+        set parent_id = #{parentId,jdbcType=INTEGER},
+            name      = #{name,jdbcType=VARCHAR},
+            status    = #{status,jdbcType=INTEGER},
+            sort      = #{sort,jdbcType=INTEGER}
+            where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

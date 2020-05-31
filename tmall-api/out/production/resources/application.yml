@@ -1,0 +1,51 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  main:
+    banner-mode: console
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    # druid 线程池
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_URL:localhost:3306/${MYSQL_DATABASE:Tmall}}?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2b8&allowMultiQueries=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:root}
+  rabbitmq:
+    host: 47.113.81.251
+    port: 5672
+    virtual-host: /mall
+    username: admin
+    password: blissleek
+    connection-timeout: 10000
+
+  # 开启文件上传功能
+  servlet:
+    multipart:
+      enabled: on
+      max-file-size: 100MB
+      max-request-size: 100MB
+  flyway:
+    validate-on-migrate: false
+    locations: classpath:db/migration
+
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: org.blisslee.tmall.api.entity.model
+
+
+redis:
+  host: 47.113.81.251
+  port: 6379
+  timeout: 100
+  password: blissleek
+  poolMaxTotal: 1000
+  poolMaxIdle: 500
+  poolMaxWait: 500

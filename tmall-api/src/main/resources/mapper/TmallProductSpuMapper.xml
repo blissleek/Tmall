@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.blisslee.tmall.api.mapper.TmallProductSpuMapper">
+    <resultMap id="BaseResultMap" type="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="product_category_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="product_brand_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="title" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="sub_title" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="stock" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="main_image" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="album_images" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="price" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
+            <arg column="created_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="updated_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        </constructor>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="product_category_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="product_brand_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="title" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="sub_title" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="stock" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="main_image" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="album_images" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="price" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
+            <arg column="created_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="updated_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="description" javaType="java.lang.String" jdbcType="LONGVARCHAR"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, product_category_id, product_brand_id, title, sub_title, stock, main_image, album_images,
+    status,price, created_at, updated_at
+    </sql>
+    <sql id="Blob_Column_List">
+        description
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from tmall_product_spu
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectTimeOutOrderProduct" resultMap="ResultMapWithBLOBs">
+        select *
+        from tmall_product_spu
+        where id in
+        <trim prefix="(" suffix=")">
+            <foreach collection="ids" index="index" item="id" separator=",">
+                #{id}
+            </foreach>
+        </trim>
+    </select>
+    <update id="reduceStock">
+        update tmall_product_spu
+        set stock = stock - #{stock}
+        where id = #{id}
+    </update>
+
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        FROM tmall_product_spu
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="countSelectAll" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tmall_product_spu
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from tmall_product_spu
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_product_spu (product_category_id, product_brand_id,
+        title, sub_title, stock,
+        main_image, album_images, status, price,
+        created_at, updated_at, description
+        )
+        values (#{productCategoryId,jdbcType=INTEGER}, #{productBrandId,jdbcType=INTEGER},
+        #{title,jdbcType=VARCHAR}, #{subTitle,jdbcType=VARCHAR}, #{stock,jdbcType=INTEGER},
+        #{mainImage,jdbcType=VARCHAR}, #{albumImages,jdbcType=VARCHAR},
+        #{status,jdbcType=INTEGER},#{price,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{description,jdbcType=LONGVARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_product_spu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productCategoryId != null">
+                product_category_id,
+            </if>
+            <if test="productBrandId != null">
+                product_brand_id,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="subTitle != null">
+                sub_title,
+            </if>
+            <if test="stock != null">
+                stock,
+            </if>
+            <if test="mainImage != null">
+                main_image,
+            </if>
+            <if test="albumImages != null">
+                album_images,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="createdAt != null">
+                created_at,
+            </if>
+            <if test="updatedAt != null">
+                updated_at,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productCategoryId != null">
+                #{productCategoryId,jdbcType=INTEGER},
+            </if>
+            <if test="productBrandId != null">
+                #{productBrandId,jdbcType=INTEGER},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="subTitle != null">
+                #{subTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="stock != null">
+                #{stock,jdbcType=INTEGER},
+            </if>
+            <if test="mainImage != null">
+                #{mainImage,jdbcType=VARCHAR},
+            </if>
+            <if test="albumImages != null">
+                #{albumImages,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="createdAt != null">
+                #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        update tmall_product_spu
+        <set>
+            <if test="productCategoryId != null">
+                product_category_id = #{productCategoryId,jdbcType=INTEGER},
+            </if>
+            <if test="productBrandId != null">
+                product_brand_id = #{productBrandId,jdbcType=INTEGER},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="subTitle != null">
+                sub_title = #{subTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="stock != null">
+                stock = #{stock,jdbcType=INTEGER},
+            </if>
+            <if test="mainImage != null">
+                main_image = #{mainImage,jdbcType=VARCHAR},
+            </if>
+            <if test="albumImages != null">
+                album_images = #{albumImages,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        update tmall_product_spu
+        set product_category_id = #{productCategoryId,jdbcType=INTEGER},
+            product_brand_id    = #{productBrandId,jdbcType=INTEGER},
+            title               = #{title,jdbcType=VARCHAR},
+            sub_title           = #{subTitle,jdbcType=VARCHAR},
+            stock               = #{stock,jdbcType=INTEGER},
+            main_image          = #{mainImage,jdbcType=VARCHAR},
+            album_images        = #{albumImages,jdbcType=VARCHAR},
+            status              = #{status,jdbcType=INTEGER},
+            price               = #{price,jdbcType=DECIMAL},
+            description         = #{description,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="org.blisslee.tmall.api.entity.model.TmallProductSpu">
+        update tmall_product_spu
+        set product_category_id = #{productCategoryId,jdbcType=INTEGER},
+            product_brand_id    = #{productBrandId,jdbcType=INTEGER},
+            title               = #{title,jdbcType=VARCHAR},
+            sub_title           = #{subTitle,jdbcType=VARCHAR},
+            stock               = #{stock,jdbcType=INTEGER},
+            main_image          = #{mainImage,jdbcType=VARCHAR},
+            album_images        = #{albumImages,jdbcType=VARCHAR},
+            status              = #{status,jdbcType=INTEGER},
+            price               = #{price,jdbcType=DECIMAL}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

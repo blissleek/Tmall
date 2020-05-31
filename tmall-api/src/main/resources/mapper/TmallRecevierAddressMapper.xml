@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.blisslee.tmall.api.mapper.TmallRecevierAddressMapper">
+    <resultMap id="BaseResultMap" type="org.blisslee.tmall.api.entity.model.TmallRecevierAddress">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="receiver_name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="receiver_phone" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="receiver_province" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="receiver_city" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="receiver_region" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="receiver_detail_address" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="note" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="is_default" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="created_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="updated_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_region,
+    receiver_detail_address, note,is_default, created_at, updated_at
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tmall_recevier_address
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectDefaultAddress" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tmall_recevier_address
+        where user_id =  #{userId,jdbcType=INTEGER} AND is_default = 1
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tmall_recevier_address
+        WHERE user_id = #{userId,jdbcType=INTEGER}
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="countSelectAll" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tmall_recevier_address
+        WHERE user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from tmall_recevier_address
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="org.blisslee.tmall.api.entity.model.TmallRecevierAddress">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_recevier_address (user_id, receiver_name, receiver_phone,
+        receiver_province, receiver_city, receiver_region,
+        receiver_detail_address, note,is_default, created_at,
+        updated_at)
+        values (#{userId,jdbcType=INTEGER}, #{receiverName,jdbcType=VARCHAR}, #{receiverPhone,jdbcType=VARCHAR},
+        #{receiverProvince,jdbcType=VARCHAR}, #{receiverCity,jdbcType=VARCHAR}, #{receiverRegion,jdbcType=VARCHAR},
+        #{receiverDetailAddress,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR},#{isDefault,jdbcType=INTEGER},
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP)
+    </insert>
+    <insert id="insertSelective" parameterType="org.blisslee.tmall.api.entity.model.TmallRecevierAddress">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_recevier_address
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="receiverName != null">
+                receiver_name,
+            </if>
+            <if test="receiverPhone != null">
+                receiver_phone,
+            </if>
+            <if test="receiverProvince != null">
+                receiver_province,
+            </if>
+            <if test="receiverCity != null">
+                receiver_city,
+            </if>
+            <if test="receiverRegion != null">
+                receiver_region,
+            </if>
+            <if test="receiverDetailAddress != null">
+                receiver_detail_address,
+            </if>
+            <if test="note != null">
+                note,
+            </if>
+            <if test="isDefault != null">
+                is_default,
+            </if>
+            <if test="createdAt != null">
+                created_at,
+            </if>
+            <if test="updatedAt != null">
+                updated_at,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="receiverName != null">
+                #{receiverName,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverPhone != null">
+                #{receiverPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverProvince != null">
+                #{receiverProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverCity != null">
+                #{receiverCity,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverRegion != null">
+                #{receiverRegion,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverDetailAddress != null">
+                #{receiverDetailAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="note != null">
+                #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="isDefault != null">
+                #{isDefault,jdbcType=INTEGER},
+            </if>
+            <if test="createdAt != null">
+                #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateDefaultAddress" parameterType="java.lang.Integer">
+        update tmall_recevier_address set is_default = 0 where id != #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="org.blisslee.tmall.api.entity.model.TmallRecevierAddress">
+        update tmall_recevier_address
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="receiverName != null">
+                receiver_name = #{receiverName,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverPhone != null">
+                receiver_phone = #{receiverPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverProvince != null">
+                receiver_province = #{receiverProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverCity != null">
+                receiver_city = #{receiverCity,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverRegion != null">
+                receiver_region = #{receiverRegion,jdbcType=VARCHAR},
+            </if>
+            <if test="receiverDetailAddress != null">
+                receiver_detail_address = #{receiverDetailAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="note != null">
+                note = #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="isDefault != null">
+                is_default = #{isDefault,jdbcType=INTEGER},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="org.blisslee.tmall.api.entity.model.TmallRecevierAddress">
+        update tmall_recevier_address
+        set user_id                 = #{userId,jdbcType=INTEGER},
+            receiver_name           = #{receiverName,jdbcType=VARCHAR},
+            receiver_phone          = #{receiverPhone,jdbcType=VARCHAR},
+            receiver_province       = #{receiverProvince,jdbcType=VARCHAR},
+            receiver_city           = #{receiverCity,jdbcType=VARCHAR},
+            receiver_region         = #{receiverRegion,jdbcType=VARCHAR},
+            receiver_detail_address = #{receiverDetailAddress,jdbcType=VARCHAR},
+            is_default              = #{isDefault,jdbcType=INTEGER},
+            note                    = #{note,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.blisslee.tmall.api.mapper.TmallOrderItemMapper">
+  <resultMap id="BaseResultMap" type="org.blisslee.tmall.api.entity.model.TmallOrderItem">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="order_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="order_no" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_sku_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="product_spu_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="product_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_brand" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_image" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_property" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_price" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="product_amount" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="product_quantity" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="total_price" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="created_at" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="updated_at" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, order_id, order_no, product_sku_id, product_spu_id, product_name, product_brand, 
+    product_image, product_property, product_price, product_amount, product_quantity, 
+    total_price, created_at, updated_at
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tmall_order_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM tmall_order_item
+    where order_id = #{orderId}
+    limit #{offset}, #{pageSize}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tmall_order_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <select id="selectTimeOutOrderItem" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tmall_order_item
+    where order_id in
+    <trim prefix="(" suffix=")">
+      <foreach collection="orderIds" index="index" item="id" separator=",">
+        #{id}
+      </foreach>
+    </trim>
+  </select>
+  <insert id="insert" parameterType="org.blisslee.tmall.api.entity.model.TmallOrderItem">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tmall_order_item (order_id, order_no, product_sku_id, 
+      product_spu_id, product_name, product_brand, 
+      product_image, product_property, product_price, 
+      product_amount, product_quantity, total_price, 
+      created_at, updated_at)
+    values (#{orderId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{productSkuId,jdbcType=INTEGER}, 
+      #{productSpuId,jdbcType=INTEGER}, #{productName,jdbcType=VARCHAR}, #{productBrand,jdbcType=VARCHAR}, 
+      #{productImage,jdbcType=VARCHAR}, #{productProperty,jdbcType=VARCHAR}, #{productPrice,jdbcType=DECIMAL}, 
+      #{productAmount,jdbcType=DECIMAL}, #{productQuantity,jdbcType=INTEGER}, #{totalPrice,jdbcType=DECIMAL},
+    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+  </insert>
+  <insert id="insertSelective" parameterType="org.blisslee.tmall.api.entity.model.TmallOrderItem">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tmall_order_item
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="productSkuId != null">
+        product_sku_id,
+      </if>
+      <if test="productSpuId != null">
+        product_spu_id,
+      </if>
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="productBrand != null">
+        product_brand,
+      </if>
+      <if test="productImage != null">
+        product_image,
+      </if>
+      <if test="productProperty != null">
+        product_property,
+      </if>
+      <if test="productPrice != null">
+        product_price,
+      </if>
+      <if test="productAmount != null">
+        product_amount,
+      </if>
+      <if test="productQuantity != null">
+        product_quantity,
+      </if>
+      <if test="totalPrice != null">
+        total_price,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productSkuId != null">
+        #{productSkuId,jdbcType=INTEGER},
+      </if>
+      <if test="productSpuId != null">
+        #{productSpuId,jdbcType=INTEGER},
+      </if>
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productBrand != null">
+        #{productBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="productImage != null">
+        #{productImage,jdbcType=VARCHAR},
+      </if>
+      <if test="productProperty != null">
+        #{productProperty,jdbcType=VARCHAR},
+      </if>
+      <if test="productPrice != null">
+        #{productPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="productAmount != null">
+        #{productAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="productQuantity != null">
+        #{productQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.blisslee.tmall.api.entity.model.TmallOrderItem">
+    update tmall_order_item
+    <set>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productSkuId != null">
+        product_sku_id = #{productSkuId,jdbcType=INTEGER},
+      </if>
+      <if test="productSpuId != null">
+        product_spu_id = #{productSpuId,jdbcType=INTEGER},
+      </if>
+      <if test="productName != null">
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productBrand != null">
+        product_brand = #{productBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="productImage != null">
+        product_image = #{productImage,jdbcType=VARCHAR},
+      </if>
+      <if test="productProperty != null">
+        product_property = #{productProperty,jdbcType=VARCHAR},
+      </if>
+      <if test="productPrice != null">
+        product_price = #{productPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="productAmount != null">
+        product_amount = #{productAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="productQuantity != null">
+        product_quantity = #{productQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="totalPrice != null">
+        total_price = #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.blisslee.tmall.api.entity.model.TmallOrderItem">
+    update tmall_order_item
+    set order_id = #{orderId,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      product_sku_id = #{productSkuId,jdbcType=INTEGER},
+      product_spu_id = #{productSpuId,jdbcType=INTEGER},
+      product_name = #{productName,jdbcType=VARCHAR},
+      product_brand = #{productBrand,jdbcType=VARCHAR},
+      product_image = #{productImage,jdbcType=VARCHAR},
+      product_property = #{productProperty,jdbcType=VARCHAR},
+      product_price = #{productPrice,jdbcType=DECIMAL},
+      product_amount = #{productAmount,jdbcType=DECIMAL},
+      product_quantity = #{productQuantity,jdbcType=INTEGER},
+      total_price = #{totalPrice,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

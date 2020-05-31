@@ -1,0 +1,6 @@
+rootProject.name = 'Tmall'
+include 'tmall-api'
+include 'tmall-attachment'
+include 'tmall-common'
+
+

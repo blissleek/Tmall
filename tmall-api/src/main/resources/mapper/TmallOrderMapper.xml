@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.blisslee.tmall.api.mapper.TmallOrderMapper">
+    <resultMap id="BaseResultMap" type="org.blisslee.tmall.api.entity.model.TmallOrder">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="address_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="order_no" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="total_amount" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
+            <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="payment_type" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="payment_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="delete_status" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="delivery_company" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="delivery_no" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="delivery_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="receive_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="created_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="updated_at" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, address_id, order_no, total_amount, status, payment_type, payment_time,
+    delete_status, delivery_company, delivery_no, delivery_time, receive_time, created_at, 
+    updated_at
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tmall_order
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tmall_order
+        <where>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER} and delete_status = 0
+            </if>
+            <if test="status != null">
+                and status = #{status,jdbcType=INTEGER}
+            </if>
+        </where>
+        order by created_at DESC
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectTimeOutOrders" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tmall_order
+        WHERE status = 0 AND created_at &lt; date_add(NOW(), INTERVAL -#{minute} MINUTE);
+    </select>
+
+    <update id="updateOrderStatus">
+        update tmall_order
+        set status = #{status}
+        where id in
+        <foreach collection="orderIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="cancelOrder"  parameterType="java.lang.Integer">
+        update tmall_order
+        set status = 4
+        where id = #{orderId} and status = 0
+    </update>
+
+    <update id="payOrder"  parameterType="org.blisslee.tmall.api.entity.model.TmallOrder">
+        update tmall_order
+        set payment_type = #{paymentType} , payment_time = CURRENT_TIMESTAMP,status = 1
+        where id = #{id}
+    </update>
+    <select id="countSelectAll" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tmall_order
+        <where>
+
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER} and  delete_status = 0
+            </if>
+            <if test="status != null">
+                and status = #{status,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--  将订单的状态修改为已删除-->
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        update tmall_order
+        set status = 1
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insert" parameterType="org.blisslee.tmall.api.entity.model.TmallOrder">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_order (user_id, address_id, order_no,
+        total_amount, status, payment_type,
+        payment_time, delete_status, delivery_company,
+        delivery_no, delivery_time, receive_time,
+        created_at, updated_at)
+        values (#{userId,jdbcType=INTEGER}, #{addressId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR},
+        #{totalAmount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{paymentType,jdbcType=INTEGER},
+        #{paymentTime,jdbcType=TIMESTAMP}, #{deleteStatus,jdbcType=INTEGER}, #{deliveryCompany,jdbcType=VARCHAR},
+        #{deliveryNo,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=TIMESTAMP}, #{receiveTime,jdbcType=TIMESTAMP},
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+    <insert id="insertSelective" parameterType="org.blisslee.tmall.api.entity.model.TmallOrder">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tmall_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="addressId != null">
+                address_id,
+            </if>
+            <if test="orderNo != null">
+                order_no,
+            </if>
+            <if test="totalAmount != null">
+                total_amount,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="paymentType != null">
+                payment_type,
+            </if>
+            <if test="paymentTime != null">
+                payment_time,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+            <if test="deliveryCompany != null">
+                delivery_company,
+            </if>
+            <if test="deliveryNo != null">
+                delivery_no,
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time,
+            </if>
+            <if test="receiveTime != null">
+                receive_time,
+            </if>
+            <if test="createdAt != null">
+                created_at,
+            </if>
+            <if test="updatedAt != null">
+                updated_at,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="addressId != null">
+                #{addressId,jdbcType=INTEGER},
+            </if>
+            <if test="orderNo != null">
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalAmount != null">
+                #{totalAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="paymentType != null">
+                #{paymentType,jdbcType=INTEGER},
+            </if>
+            <if test="paymentTime != null">
+                #{paymentTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=INTEGER},
+            </if>
+            <if test="deliveryCompany != null">
+                #{deliveryCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryNo != null">
+                #{deliveryNo,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryTime != null">
+                #{deliveryTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="receiveTime != null">
+                #{receiveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdAt != null">
+                #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="org.blisslee.tmall.api.entity.model.TmallOrder">
+        update tmall_order
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="addressId != null">
+                address_id = #{addressId,jdbcType=INTEGER},
+            </if>
+            <if test="orderNo != null">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalAmount != null">
+                total_amount = #{totalAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="paymentType != null">
+                payment_type = #{paymentType,jdbcType=INTEGER},
+            </if>
+            <if test="paymentTime != null">
+                payment_time = #{paymentTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                delete_status = #{deleteStatus,jdbcType=INTEGER},
+            </if>
+            <if test="deliveryCompany != null">
+                delivery_company = #{deliveryCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryNo != null">
+                delivery_no = #{deliveryNo,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time = CURRENT_TIMESTAMP,
+            </if>
+            <if test="receiveTime != null">
+                receive_time = CURRENT_TIMESTAMP,
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="org.blisslee.tmall.api.entity.model.TmallOrder">
+        update tmall_order
+        set user_id          = #{userId,jdbcType=INTEGER},
+            address_id       = #{addressId,jdbcType=INTEGER},
+            order_no         = #{orderNo,jdbcType=VARCHAR},
+            total_amount     = #{totalAmount,jdbcType=DECIMAL},
+            status           = #{status,jdbcType=INTEGER},
+            payment_type     = #{paymentType,jdbcType=INTEGER},
+            payment_time     = #{paymentTime,jdbcType=TIMESTAMP},
+            delete_status    = #{deleteStatus,jdbcType=INTEGER},
+            delivery_company = #{deliveryCompany,jdbcType=VARCHAR},
+            delivery_no      = #{deliveryNo,jdbcType=VARCHAR},
+            delivery_time    = #{deliveryTime,jdbcType=TIMESTAMP},
+            receive_time     = #{receiveTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>
